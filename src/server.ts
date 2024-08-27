@@ -7,7 +7,7 @@ const port = process.env.PORT || 5002;
 import cors from 'cors';
 app.use(cors());
 app.use(express.json());
-  
-app.use('/api', routes);sdfsdf
+
+app.use('/api', routes);
 
 app.listen(port, () => console.log(`server listening on port ${port}`));
