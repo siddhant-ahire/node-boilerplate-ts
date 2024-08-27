@@ -6,6 +6,7 @@
   "scripts": {
     "start": "tsc && node dist/index.js",
     "dev": "nodemon src/server.ts",
+    "prepare": "husky",
     "pre-commit": "lint-staged",
     "lint": "npx eslint src --no-cache --fix",
     "format": "npx prettier --write src/**/*.{js,ts}"

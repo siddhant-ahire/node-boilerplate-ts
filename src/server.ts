@@ -8,6 +8,6 @@ import cors from 'cors';
 app.use(cors());
 app.use(express.json());
   
-app.use('/api', routes);
+app.use('/api', routes);sdfsdf
 
 app.listen(port, () => console.log(`server listening on port ${port}`));
