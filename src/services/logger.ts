@@ -7,7 +7,7 @@ const logFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.json() // Log as JSON for better structure
 );
-const log_path = __dirname+"../../../";
+const log_path = __dirname + '../../../';
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.simple() // Simple format for console output
@@ -21,7 +21,7 @@ export const logger = winston.createLogger({
     // Log to console in development
     new winston.transports.Console({
       format: consoleFormat,
-      level: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     }),
     // Log to file in production
     new winston.transports.File({
@@ -30,16 +30,16 @@ export const logger = winston.createLogger({
       maxsize: 5242880, // 5MB
       maxFiles: 5, // Keep a maximum of 5 log files
       tailable: true,
-    })
+    }),
   ],
   exceptionHandlers: [
     new winston.transports.File({
-      filename: path.join(log_path, 'logs', 'exceptions.log')
-    })
+      filename: path.join(log_path, 'logs', 'exceptions.log'),
+    }),
   ],
   rejectionHandlers: [
     new winston.transports.File({
-      filename: path.join(log_path, 'logs', 'rejections.log')
-    })
-  ]
+      filename: path.join(log_path, 'logs', 'rejections.log'),
+    }),
+  ],
 });

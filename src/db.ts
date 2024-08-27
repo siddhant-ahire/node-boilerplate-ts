@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-async function checkConnection() {
+async function checkConnection(): Promise<void> {
   try {
     // Test the connection by running a simple query or just connecting
     await prisma.$connect();
@@ -20,7 +20,7 @@ checkConnection()
   })
   .catch((error) => {
     // Connection failed, handle the error if needed
-    console.error('Exiting due to database connection error.');
+    console.error('Exiting due to database connection error.', error);
     process.exit(1); // Exit the process if the connection fails
   });
 
