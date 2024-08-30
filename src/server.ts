@@ -1,13 +1,41 @@
 require('module-alias/register');
-import express, { Application } from 'express';
-import routes from '@/src/routes';
+import { Server } from 'http';
+import app from '@/src/app';
+import logger from '@/src/utils/logger';
+import errorHandler from '@/src/utils/errorHandler';
 require('dotenv').config();
-const app: Application = express();
 const port = process.env.PORT || 5002;
-import cors from 'cors';
-app.use(cors());
-app.use(express.json());
+const projectName = 'hshdhs';
+const server: Server = app.listen(port, (): void => {
+  logger.info(`Aapplication '${projectName}' listens on PORT: ${port}`);
+});
 
-app.use('/api', routes);
+const exitHandler = (): void => {
+  if (typeof app === 'object' && app !== null) {
+    server.close(() => {
+      logger.info('Server closed');
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+};
 
-app.listen(port, () => console.log(`server listening on port ${port}`));
+const unexpectedErrorHandler = (error: Error): void => {
+  errorHandler.handleError(error);
+  if (!errorHandler.isTrustedError(error)) {
+    exitHandler();
+  }
+};
+
+process.on('uncaughtException', unexpectedErrorHandler);
+process.on('unhandledRejection', (reason: Error) => {
+  throw reason;
+});
+
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received');
+  if (server) {
+    server.close();
+  }
+});

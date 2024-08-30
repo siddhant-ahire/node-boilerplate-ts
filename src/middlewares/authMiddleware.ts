@@ -23,12 +23,14 @@ export default async (
       req.profile = profile;
       next();
     } else {
-      res.status(401).json(errorResponse('User Not Authenticated'));
+      res.status(401).json(errorResponse(res, 'User Not Authenticated'));
     }
   } catch (error) {
     const customError = error as CustomError;
     res
       .status(500)
-      .json(errorResponse('Error in auth middleware', customError.message));
+      .json(
+        errorResponse(res, 'Error in auth middleware', customError.message)
+      );
   }
 };

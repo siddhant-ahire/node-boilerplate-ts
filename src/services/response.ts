@@ -1,3 +1,5 @@
+import { Response } from 'express';
+
 interface ApiResponse<T> {
   status: string;
   message: string;
@@ -17,9 +19,11 @@ export const successResponse = <T>(
 };
 
 export const errorResponse = (
+  res: Response,
   message: string,
   error?: unknown
 ): ApiResponse<null> => {
+  res.locals.errorMessage = message + ' || ' + error;
   return {
     status: 'error',
     message,

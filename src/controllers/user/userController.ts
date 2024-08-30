@@ -13,7 +13,7 @@ export async function register(req: Request, res: Response): Promise<Response> {
     const { error } = registerUser.validate(req.body);
 
     if (error) {
-      return res.status(400).json(errorResponse(error.details[0].message));
+      return res.status(400).json(errorResponse(res, error.details[0].message));
     }
     // check if the user already exists
     const userExists = await prisma.user.findUnique({
@@ -44,7 +44,7 @@ export async function register(req: Request, res: Response): Promise<Response> {
     });
     return res
       .status(500)
-      .json(errorResponse('Error in register', customError.message));
+      .json(errorResponse(res, 'Error in register', customError.message));
   }
 }
 
@@ -54,7 +54,7 @@ export async function login(req: Request, res: Response): Promise<Response> {
     const { error } = loginUser.validate(req.body);
 
     if (error) {
-      return res.status(400).json(errorResponse(error.details[0].message));
+      return res.status(400).json(errorResponse(res, error.details[0].message));
     }
     // check if the user exists
     const user = await prisma.user.findUnique({
@@ -89,7 +89,7 @@ export async function login(req: Request, res: Response): Promise<Response> {
     });
     return res
       .status(500)
-      .json(errorResponse('Error in login', customError.message));
+      .json(errorResponse(res, 'Error in login', customError.message));
   }
 }
 
@@ -111,6 +111,6 @@ export async function getUser(
     });
     return res
       .status(500)
-      .json(errorResponse('Error in getUser', customError.message));
+      .json(errorResponse(res, 'Error in getUser', customError.message));
   }
 }
