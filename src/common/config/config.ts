@@ -1,4 +1,5 @@
 import Joi from 'joi';
+require('dotenv').config();
 
 // All env variables used by the app should be defined in this file.
 
@@ -35,4 +36,5 @@ export default {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   xApiKey: envVars.API_KEY_TOKEN,
+  projectVersion: 'v1',
 };

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import morgan from 'morgan';
 
-import config from '@/src/config/config';
-import logger from '@/src/utils/logger';
+import config from '@/src/common/config/config';
+import logger from '@/src/common/utils/logger';
 
 morgan.token(
   'message',

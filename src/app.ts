@@ -1,13 +1,11 @@
 import express, { Application } from 'express';
-
-import routes from '@/src/routes';
 import httpContext from 'express-http-context';
-import consts from '@/src/config/consts';
-import httpLogger from '@/src/utils/httpLogger';
-import errorHandling from '@/src/middlewares/errorHandling.middleware';
-import uniqueReqId from '@/src/middlewares/uniqueReqId.middleware';
-import http404 from '@/src/404/404.router';
-// import swaggerApiDocs from '@components/swagger-ui/swagger.router';
+import routes from '@/src/v1/routes';
+import httpLogger from '@/src/common/utils/httpLogger';
+import errorHandling from '@/src/common/middlewares/errorHandling.middleware';
+import uniqueReqId from '@/src/common/middlewares/uniqueReqId.middleware';
+import http404 from '@/src/common/404/404.router';
+import swaggerApiDocs from '@/src/common/swagger-ui/swagger.router';
 
 const app: Application = express();
 
@@ -16,8 +14,8 @@ app.use(httpLogger.successHandler);
 app.use(httpLogger.errorHandler);
 app.use(uniqueReqId);
 app.use(express.json());
-app.use(consts.API_ROOT_PATH, routes);
-// app.use(swaggerApiDocs);
+app.use('/api/v1', routes);
+app.use(swaggerApiDocs);
 app.use(http404);
 
 app.use(errorHandling);

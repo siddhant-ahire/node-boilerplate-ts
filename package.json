@@ -9,7 +9,7 @@
     "prepare": "husky install",
     "pre-commit": "lint-staged",
     "lint": "npx eslint src --no-cache --fix",
-    "format": "npx prettier --write src/**/*.{js,ts}"
+    "format": "npx prettier --write src/**/*.{js,ts,json}"
   },
   "_moduleAliases": {
     "@/src": "src/"
@@ -25,6 +25,7 @@
   "dependencies": {
     "@prisma/client": "^5.18.0",
     "@types/morgan": "^1.9.3",
+    "@types/swagger-ui-express": "^4.1.6",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -36,7 +37,8 @@
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

@@ -1,4 +1,4 @@
-import logger from '@/src/utils/logger';
+import logger from '@/src/common/utils/logger';
 
 import AppError from './appError';
 

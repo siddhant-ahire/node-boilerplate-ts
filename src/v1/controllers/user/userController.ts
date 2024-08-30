@@ -1,9 +1,9 @@
-import { CustomError, RequestWithProfile } from '@/src/types';
+import { CustomError, RequestWithProfile } from '@/src/v1/types';
 import { Request, Response } from 'express';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-import { successResponse, errorResponse } from '@/src/services/response';
-import { logger } from '@/src/services/logger';
+import { successResponse, errorResponse } from '@/src/v1/services/response';
+import { logger } from '@/src/v1/services/logger';
 import { loginUser, registerUser } from './userJoiModel';
 import prisma from '@/src/db';
 

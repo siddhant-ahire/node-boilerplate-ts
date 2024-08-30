@@ -1,8 +1,8 @@
 require('module-alias/register');
 import { Server } from 'http';
 import app from '@/src/app';
-import logger from '@/src/utils/logger';
-import errorHandler from '@/src/utils/errorHandler';
+import logger from '@/src/common/utils/logger';
+import errorHandler from '@/src/common/utils/errorHandler';
 require('dotenv').config();
 const port = process.env.PORT || 5002;
 const projectName = 'hshdhs';

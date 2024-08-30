@@ -1,0 +1,62 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "NodeJS BoilerPlate API",
+    "description": "A boilerplate for Node.js applications with common patterns and best practices.",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "basePath": "/api/v1",
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["HealthCheck"],
+        "summary": "Check the health status of the application.",
+        "description": "This endpoint returns a status message to verify if the application is running correctly.",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Application is healthy",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "example": "Hey everything is OK"
+                },
+                "uptime": {
+                  "type": "number",
+                  "example": 123456
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-08-30T12:34:56Z"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Something went wrong"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

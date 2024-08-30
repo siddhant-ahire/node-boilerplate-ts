@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-import { CustomError, RequestWithProfile } from '@/src/types';
+import { CustomError, RequestWithProfile } from '@/src/v1/types';
 import { NextFunction, Response } from 'express';
 import { errorResponse } from '../services/response';
 import prisma from '@/src/db';

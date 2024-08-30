@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
 import httpContext from 'express-http-context';
-import logger from '@/src/utils/logger';
+import logger from '@/src/common/utils/logger';
 
 const uniqueReqId = (req: Request, res: Response, next: NextFunction): void => {
   httpContext.set('ReqId', uuidv4());

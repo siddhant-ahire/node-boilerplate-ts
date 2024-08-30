@@ -1,7 +1,7 @@
 import winston from 'winston';
 const RnR = require('runtime-node-refresh');
 import httpContext from 'express-http-context';
-import config from '@/src/config/config';
+import config from '@/src/common/config/config';
 
 interface CustomErrorTemp {
   timestamp?: string;
