@@ -43,6 +43,24 @@ DATABASE_URL="mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${D
 # for docker connection <<<<<<<<<<<<<
 
 ```
+Create a `.env.test` file in the root directory of the project to run tests with the following content:
+```
+PORT=5002
+JWT_SECRET="your-jwt-secret"
+NODE_ENV="development" # development, staging, production
+
+# DATABASE_URL="mysql://root:password@localhost:3306/node_boilerplate" #for local connection
+
+# for docker connection >>>>>>>>>>>>
+DATABASE_USER="root"
+DATABASE_NAME="node_boilerplate"
+DATABASE_PASSWORD="123456"
+DATABASE_PORT=3307
+DATABASE_HOST="localhost"
+DATABASE_URL="mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}" 
+# for docker connection <<<<<<<<<<<<<
+```
+
 ### 3. Run Docker Compose to build and start the containers:
 
 ```

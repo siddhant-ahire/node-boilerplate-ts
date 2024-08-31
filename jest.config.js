@@ -1,7 +1,7 @@
 const { pathsToModuleNameMapper } = require('ts-jest');
 const { compilerOptions } = require('./tsconfig.json');
 process.env.NODE_ENV='development';
-require('dotenv').config();
+require('dotenv').config({ path: '.env.test' });
 
 module.exports = {
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, { prefix: '<rootDir>/' }),
