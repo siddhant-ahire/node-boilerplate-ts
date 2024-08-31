@@ -17,7 +17,7 @@ if (config.env !== 'production') {
     swaggerBasePath
   );
 } else {
-  router.use(consts.API_DOCS_PATH, swaggerForbidden);
+  router.use(`${consts.API_DOCS_PATH}/:version`, swaggerForbidden);
 }
 
 export default router;
