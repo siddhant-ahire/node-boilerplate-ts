@@ -5,7 +5,7 @@ import httpLogger from '@/src/common/utils/httpLogger';
 import errorHandling from '@/src/common/middlewares/errorHandling.middleware';
 import uniqueReqId from '@/src/common/middlewares/uniqueReqId.middleware';
 import http404 from '@/src/common/404/404.router';
-import swaggerApiDocs from '@/src/common/swagger-ui/swagger.router';
+import swaggerApiDocs from '@/src/swagger-ui/swagger.router';
 
 const app: Application = express();
 

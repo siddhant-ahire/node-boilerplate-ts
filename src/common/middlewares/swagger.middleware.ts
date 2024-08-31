@@ -5,8 +5,8 @@ import swaggerUi from 'swagger-ui-express';
 import AppError from '@/src/common/utils/appError';
 import logger from '@/src/common/utils/logger';
 import consts from '@/src/common/config/consts';
-import swaggerDocumentV1 from '@/src/common/swagger-ui/data/swagger-v1.json';
-import swaggerDocumentV2 from '@/src/common/swagger-ui/data/swagger-v2.json';
+import swaggerDocumentV1 from '@/src/swagger-ui/data/swagger-v1.json';
+import swaggerDocumentV2 from '@/src/swagger-ui/data/swagger-v2.json';
 
 const swaggerForbidden = (): void => {
   logger.error('Trying to access swagger docs on production');
