@@ -11,7 +11,7 @@ export default async (
 ): Promise<void> => {
   try {
     const token = req?.headers?.authorization?.split(' ')[1];
-    const decryptedToken = jwt.verify(token, process.env.API_KEY_TOKEN);
+    const decryptedToken = jwt.verify(token, process.env.JWT_SECRET);
     if (decryptedToken) {
       const profile = await prisma.user.findUnique({
         where: {

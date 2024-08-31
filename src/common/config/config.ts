@@ -13,10 +13,10 @@ require('dotenv').config();
 const envsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string()
-      .valid('production', 'integration', 'development')
+      .valid('production', 'staging', 'development')
       .required(),
     PORT: Joi.number().default(8080),
-    API_KEY_TOKEN: Joi.string().required(),
+    JWT_SECRET: Joi.string().required(),
   })
   .unknown(true);
 
@@ -35,6 +35,6 @@ if (error) {
 export default {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
-  xApiKey: envVars.API_KEY_TOKEN,
+  xApiKey: envVars.JWT_SECRET,
   projectVersion: 'v1',
 };

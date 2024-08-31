@@ -80,7 +80,7 @@ export async function login(req: Request, res: Response): Promise<Response> {
     // create and assign a token
     const token = jwt.sign(
       { user_id: user.user_id },
-      process.env.API_KEY_TOKEN as string,
+      process.env.JWT_SECRET as string,
       {
         expiresIn: '1d',
       }
