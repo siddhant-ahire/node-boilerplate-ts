@@ -20,7 +20,6 @@
         "summary": "Check the health status of the application.",
         "description": "This endpoint returns a status message to verify if the application is running correctly.",
         "produces": ["application/json"],
-        "consumes": ["application/json"],
         "responses": {
           "200": {
             "description": "Application is healthy",
@@ -51,6 +50,233 @@
                 "error": {
                   "type": "string",
                   "example": "Something went wrong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/register": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Register a new user",
+        "description": "Register a new user with a username, email, and password.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User object that needs to be registered",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["user_name", "user_email", "user_password"],
+              "properties": {
+                "user_name": {
+                  "type": "string",
+                  "description": "Username of the new user",
+                  "example": "johndoe"
+                },
+                "user_email": {
+                  "type": "string",
+                  "description": "Email address of the new user",
+                  "format": "email",
+                  "example": "johndoe@example.com"
+                },
+                "user_password": {
+                  "type": "string",
+                  "description": "Password for the new user",
+                  "format": "password",
+                  "example": "Passw0rd!"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User successfully registered",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "User registered successfully."
+                },
+                "user_id": {
+                  "type": "string",
+                  "example": "123456"
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request, e.g., validation errors",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid input data."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Log in a user",
+        "description": "Log in a user with an email and password.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User credentials for logging in",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["user_email", "user_password"],
+              "properties": {
+                "user_email": {
+                  "type": "string",
+                  "description": "Email address of the user",
+                  "format": "email",
+                  "example": "johndoe@example.com"
+                },
+                "user_password": {
+                  "type": "string",
+                  "description": "Password of the user",
+                  "format": "password",
+                  "example": "Passw0rd!"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Login successful."
+                },
+                "token": {
+                  "type": "string",
+                  "description": "Authentication token for the user",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, invalid credentials",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid email or password."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Retrieve user information",
+        "description": "Retrieve user information by passing an authentication token in the `Authorization` header.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "Authentication token",
+            "required": true,
+            "type": "string",
+            "default": "Bearer {token}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User information retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "description": "ID of the user",
+                  "example": "123456"
+                },
+                "user_name": {
+                  "type": "string",
+                  "description": "Username of the user",
+                  "example": "johndoe"
+                },
+                "user_email": {
+                  "type": "string",
+                  "description": "Email address of the user",
+                  "format": "email",
+                  "example": "johndoe@example.com"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, invalid token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized access. Invalid token."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
                 }
               }
             }

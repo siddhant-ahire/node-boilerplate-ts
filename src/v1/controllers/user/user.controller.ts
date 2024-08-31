@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 import { successResponse, errorResponse } from '@/src/v1/services/response';
 import { logger } from '@/src/v1/services/logger';
-import { loginUser, registerUser } from './userJoiModel';
+import { loginUser, registerUser } from './user.joi.model';
 import prisma from '@/src/db';
 
 export async function register(req: Request, res: Response): Promise<Response> {
@@ -59,6 +59,10 @@ export async function login(req: Request, res: Response): Promise<Response> {
     // check if the user exists
     const user = await prisma.user.findUnique({
       where: { user_email: req.body.user_email },
+      select: {
+        user_password: true,
+        user_id: true,
+      },
     });
     if (!user) {
       throw new Error('User does not exist');
@@ -74,9 +78,13 @@ export async function login(req: Request, res: Response): Promise<Response> {
     }
 
     // create and assign a token
-    const token = jwt.sign({ user_id: user.user_id }, process.env.jwt_secret, {
-      expiresIn: '1d',
-    });
+    const token = jwt.sign(
+      { user_id: user.user_id },
+      process.env.API_KEY_TOKEN as string,
+      {
+        expiresIn: '1d',
+      }
+    );
     return res
       .status(200)
       .json(successResponse('User logged in successfully', token));

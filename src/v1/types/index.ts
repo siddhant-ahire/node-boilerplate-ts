@@ -1,7 +1,7 @@
 import { Request } from 'express';
 
 export interface Profile {
-  user_id: bigint;
+  user_id: number;
   user_name: string;
   user_email: string;
   user_password?: string;

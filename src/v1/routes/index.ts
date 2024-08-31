@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import healthRoute from '@/src/v1/controllers/healthcheck';
-import usersRoute from '@/src/v1/controllers/user';
+import healthRoute from '@/src/v1/controllers/healthcheck/healthcheck';
+import usersRoute from '@/src/v1/controllers/user/user.routes';
 
 const router: Router = Router();
 

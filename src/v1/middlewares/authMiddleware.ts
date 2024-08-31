@@ -11,17 +11,21 @@ export default async (
 ): Promise<void> => {
   try {
     const token = req?.headers?.authorization?.split(' ')[1];
-    const decryptedToken = jwt.verify(token, process.env.jwt_secret);
-    const profile = await prisma.user.findUnique({
-      where: {
-        user_email: decryptedToken.user_id,
-        user_deleted: false,
-        user_active: true,
-      },
-    });
-    if (profile) {
-      req.profile = profile;
-      next();
+    const decryptedToken = jwt.verify(token, process.env.API_KEY_TOKEN);
+    if (decryptedToken) {
+      const profile = await prisma.user.findUnique({
+        where: {
+          user_id: decryptedToken.user_id,
+          user_deleted: false,
+          user_active: true,
+        },
+      });
+      if (profile) {
+        req.profile = profile;
+        next();
+      } else {
+        res.status(401).json(errorResponse(res, 'User Not Authenticated'));
+      }
     } else {
       res.status(401).json(errorResponse(res, 'User Not Authenticated'));
     }
