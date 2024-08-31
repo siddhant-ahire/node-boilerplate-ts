@@ -2,16 +2,19 @@
   "name": "boilerplate-ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "build": "tsc --project tsconfig.build.json && tsc-alias",
+    "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest -c jest.config.js --env=node",
+    "test:watch": "jest -c jest.config.js -i --watchAll",
+    "test:cov": "jest -c jest.config.js --coverage --env=node",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
     "lint": "npx eslint src --no-cache --fix",
-    "format": "npx prettier --write src/**/*.{js,ts,json}"
+    "format": "npx prettier --write src/**/*.{js,ts,json}",
+    "loglevel:change": "runtime-node-refresh"
+
   },
   "_moduleAliases": {
     "@/src": "src/"
@@ -67,6 +70,7 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.2.0",
     "uuid": "^10.0.0",
