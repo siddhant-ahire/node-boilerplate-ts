@@ -13,8 +13,8 @@
     "pre-commit": "lint-staged",
     "lint": "npx eslint src --no-cache --fix",
     "format": "npx prettier --write src/**/*.{js,ts,json}",
-    "loglevel:change": "runtime-node-refresh"
-
+    "loglevel:change": "runtime-node-refresh",
+    "seed": "ts-node prisma/seed.ts"
   },
   "_moduleAliases": {
     "@/src": "src/"
