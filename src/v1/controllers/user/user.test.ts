@@ -21,9 +21,9 @@ describe('POST /api/v1/user/register', () => {
   it('should return 200 for a valid request', async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(null); // No user found
     const response = await request(app).post('/api/v1/user/register').send({
-      user_name: 'test',
-      user_email: 'test@example.com',
-      user_password: 'password123',
+      user_name: 'admin',
+      user_email: 'admin@example.com',
+      user_password: '123456',
     });
 
     expect(response.status).toBe(httpStatus.OK);
@@ -38,9 +38,9 @@ describe('POST /api/v1/user/register', () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({}); // Simulate user exists
 
     const response = await request(app).post('/api/v1/user/register').send({
-      user_name: 'test',
-      user_email: 'test@example.com',
-      user_password: 'password123',
+      user_name: 'admin',
+      user_email: 'admin@example.com',
+      user_password: '123456',
     });
 
     expect(response.status).toBe(500);
@@ -56,13 +56,13 @@ describe('POST /api/v1/user/login', () => {
   it('should return 200 for a valid request', async () => {
     // Simulate a successful user lookup
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-      user_id: 2,
+      user_id: 1,
       user_password:
         '$2a$10$sXzcNpo3CXmKsSTO7GRLAezV935dhW9.QW1Uuv5rV.JvCEhW8YGW.', // Assume password is hashed correctly
     });
     const response = await request(app).post('/api/v1/user/login').send({
-      user_email: 'test@example.com',
-      user_password: 'password123',
+      user_email: 'admin@example.com',
+      user_password: '123456',
     });
 
     expect(response.status).toBe(httpStatus.OK);
@@ -82,7 +82,7 @@ describe('GET /api/v1/user', () => {
   it('should return 200 OK and correct response', async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({});
     let token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3MjUxMDMwMzIsImV4cCI6MTcyNTE4OTQzMn0.fXRdXvIagPLdEAXBe9V0-UPUSiEkPXcS90zoRiBW8SE';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJpYXQiOjE3MjUxODI4ODgsImV4cCI6MTcyNTI2OTI4OH0.JF-YB8UdDfj_mjOV4U5mBTVr2HeqFYLXFF93Ft4-l9A';
     const response = await request(app)
       .get('/api/v1/user')
       .set('Authorization', `Bearer ${token}`); // Simulate a request with token
