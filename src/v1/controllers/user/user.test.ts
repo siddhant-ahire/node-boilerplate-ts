@@ -1,8 +1,10 @@
 import { agent as request } from 'supertest';
-
+const bcrypt = require('bcryptjs');
 import httpStatus from 'http-status';
 import app from '@/src/app';
 import prisma from '@/src/db';
+
+jest.mock('bcryptjs'); // Mock the entire bcrypt module
 
 // Mock Prisma directly in the test file
 jest.mock('@/src/db', () => {
@@ -54,11 +56,13 @@ describe('POST /api/v1/user/login', () => {
     jest.resetAllMocks(); // Reset mocks before each test
   });
   it('should return 200 for a valid request', async () => {
-    // Simulate a successful user lookup
+    // Mock bcrypt.compare to always return true
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+    // Mock Prisma to return any arbitrary user data
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-      user_id: 1,
-      user_password:
-        '$2a$10$sXzcNpo3CXmKsSTO7GRLAezV935dhW9.QW1Uuv5rV.JvCEhW8YGW.', // Assume password is hashed correctly
+      user_id: 1, // Arbitrary user_id
+      user_password: 'mockedHashedPassword', // Arbitrary hashed password
     });
     const response = await request(app).post('/api/v1/user/login').send({
       user_email: 'admin@example.com',
