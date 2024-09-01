@@ -1,5 +1,7 @@
 import express, { Application } from 'express';
 import httpContext from 'express-http-context';
+import helmet from 'helmet';
+import cors from 'cors';
 import routes from '@/src/v1/routes';
 import httpLogger from '@/src/common/utils/httpLogger';
 import errorHandling from '@/src/common/middlewares/errorHandling.middleware';
@@ -8,7 +10,13 @@ import http404 from '@/src/common/404/404.router';
 import swaggerApiDocs from '@/src/swagger-ui/swagger.router';
 
 const app: Application = express();
-
+app.use(helmet());
+app.use(
+  cors({
+    origin: '*',
+    credentials: true,
+  })
+);
 app.use(httpContext.middleware);
 app.use(httpLogger.successHandler);
 app.use(httpLogger.errorHandler);

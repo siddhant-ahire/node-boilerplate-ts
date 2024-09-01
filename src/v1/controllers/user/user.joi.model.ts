@@ -12,3 +12,11 @@ export const loginUser = Joi.object({
   user_email: Joi.string().email().required(),
   user_password: Joi.string().required(),
 });
+
+export const refreshTokenUser = Joi.object({
+  refreshToken: Joi.string().required(),
+});
+
+export const logoutUser = Joi.object({
+  refreshToken: Joi.string().required(),
+});

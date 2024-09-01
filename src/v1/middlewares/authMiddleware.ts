@@ -11,7 +11,13 @@ export default async (
 ): Promise<void> => {
   try {
     const token = req?.headers?.authorization?.split(' ')[1];
-    const decryptedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!token) {
+      res.status(401).json(errorResponse(res, 'Invalid Token'));
+    }
+    const decryptedToken = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET as string
+    );
     if (decryptedToken) {
       const profile = await prisma.user.findUnique({
         where: {
@@ -27,7 +33,7 @@ export default async (
         res.status(401).json(errorResponse(res, 'User Not Authenticated'));
       }
     } else {
-      res.status(401).json(errorResponse(res, 'User Not Authenticated'));
+      res.status(401).json(errorResponse(res, 'Invalid Token'));
     }
   } catch (error) {
     const customError = error as CustomError;

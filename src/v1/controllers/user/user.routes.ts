@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { getUser, register, login } from './user.controller';
+import {
+  getUser,
+  register,
+  login,
+  refreshAccessToken,
+  logout,
+} from './user.controller';
 import authMiddleware from '@/src/v1/middlewares/authMiddleware';
 const router: Router = Router();
 
@@ -8,6 +14,12 @@ router.post('/register', register);
 
 // login a user
 router.post('/login', login);
+
+// refresh access token
+router.post('/refresh-token', refreshAccessToken);
+
+// logout
+router.post('/logout', logout);
 
 // get User Profile
 router.get('/', authMiddleware, getUser);

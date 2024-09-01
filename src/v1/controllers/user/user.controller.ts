@@ -4,8 +4,17 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 import { successResponse, errorResponse } from '@/src/v1/services/response';
 import { logger } from '@/src/v1/services/logger';
-import { loginUser, registerUser } from './user.joi.model';
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  refreshTokenUser,
+} from './user.joi.model';
 import prisma from '@/src/db';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from '@/src/v1/helper/authHelper';
 
 export async function register(req: Request, res: Response): Promise<Response> {
   try {
@@ -20,7 +29,7 @@ export async function register(req: Request, res: Response): Promise<Response> {
       where: { user_email: req.body.user_email },
     });
     if (userExists) {
-      throw new Error('User already exists');
+      return res.status(400).json(errorResponse(res, 'User already exists'));
     }
 
     // hash the password
@@ -65,7 +74,7 @@ export async function login(req: Request, res: Response): Promise<Response> {
       },
     });
     if (!user) {
-      throw new Error('User does not exist');
+      return res.status(400).json(errorResponse(res, 'User not found'));
     }
 
     // check if the password is correct
@@ -74,20 +83,28 @@ export async function login(req: Request, res: Response): Promise<Response> {
       user.user_password
     );
     if (!passwordCorrect) {
-      throw new Error('Invalid password');
+      return res.status(400).json(errorResponse(res, 'Invalid password'));
     }
 
     // create and assign a token
-    const token = jwt.sign(
-      { user_id: user.user_id },
-      process.env.JWT_SECRET as string,
-      {
-        expiresIn: '1d',
-      }
-    );
+    const accessToken = generateAccessToken(user.user_id);
+    const refreshToken = generateRefreshToken(user.user_id);
+
+    await prisma.user.update({
+      where: { user_id: user.user_id },
+      data: { user_refreshToken: refreshToken },
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     return res
       .status(200)
-      .json(successResponse('User logged in successfully', token));
+      .json(successResponse('User logged in successfully', accessToken));
   } catch (error) {
     const customError = error as CustomError;
     logger.error({
@@ -100,6 +117,94 @@ export async function login(req: Request, res: Response): Promise<Response> {
       .json(errorResponse(res, 'Error in login', customError.message));
   }
 }
+
+export async function refreshAccessToken(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    // Validate the request parameters
+    const { error } = refreshTokenUser.validate(req.cookies);
+
+    if (error) {
+      return res.status(400).json(errorResponse(res, error.details[0].message));
+    }
+    const refreshToken = req.cookies.refreshToken;
+    const user = await prisma.user.findFirst({
+      where: { user_refreshToken: refreshToken },
+    });
+    if (!user) {
+      return res.status(403).json(errorResponse(res, 'Invalid refresh token'));
+    }
+
+    return jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET as string,
+      (err: Error, decoded: { user_id: number | string }) => {
+        if (err || user.user_id !== decoded.user_id) {
+          return res.status(403).json(errorResponse(res, 'Forbidden'));
+        }
+
+        const newAccessToken = generateAccessToken(user.user_id);
+        return res
+          .status(200)
+          .json(successResponse('User logged in successfully', newAccessToken));
+      }
+    );
+  } catch (error) {
+    const customError = error as CustomError;
+    logger.error({
+      message: customError.message,
+      stack: customError.stack,
+      apiEndpoint: req.originalUrl,
+    });
+    return res
+      .status(500)
+      .json(errorResponse(res, 'Error in Refreshtoken', customError.message));
+  }
+}
+
+export const logout = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    // Validate the request parameters
+    const { error } = logoutUser.validate(req.cookies);
+
+    if (error) {
+      return res.status(400).json(errorResponse(res, error.details[0].message));
+    }
+    const refreshToken = req.cookies.refreshToken;
+    const user = await prisma.user.findFirst({
+      where: { user_refreshToken: refreshToken },
+    });
+    if (!user) return res.sendStatus(204);
+
+    await prisma.user.update({
+      where: { user_id: user.user_id },
+      data: { user_refreshToken: null },
+    });
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+
+    return res.sendStatus(204);
+  } catch (error) {
+    const customError = error as CustomError;
+    logger.error({
+      message: customError.message,
+      stack: customError.stack,
+      apiEndpoint: req.originalUrl,
+    });
+    return res
+      .status(500)
+      .json(errorResponse(res, 'Error in logout', customError.message));
+  }
+};
 
 export async function getUser(
   req: RequestWithProfile,
