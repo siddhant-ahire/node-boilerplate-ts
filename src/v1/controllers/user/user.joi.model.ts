@@ -20,3 +20,7 @@ export const refreshTokenUser = Joi.object({
 export const logoutUser = Joi.object({
   refreshToken: Joi.string().required(),
 });
+
+export const googleLoginUser = Joi.object({
+  token: Joi.string().required(),
+});

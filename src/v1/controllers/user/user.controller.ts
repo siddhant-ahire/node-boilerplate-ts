@@ -9,12 +9,15 @@ import {
   registerUser,
   logoutUser,
   refreshTokenUser,
+  googleLoginUser,
 } from './user.joi.model';
 import prisma from '@/src/db';
 import {
   generateAccessToken,
   generateRefreshToken,
 } from '@/src/v1/helper/authHelper';
+import { OAuth2Client } from 'google-auth-library';
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function register(req: Request, res: Response): Promise<Response> {
   try {
@@ -117,6 +120,81 @@ export async function login(req: Request, res: Response): Promise<Response> {
       .json(errorResponse(res, 'Error in login', customError.message));
   }
 }
+
+export const googleLogin = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    // Validate the request parameters
+    const { error } = googleLoginUser.validate(req.body);
+
+    if (error) {
+      return res.status(400).json(errorResponse(res, error.details[0].message));
+    }
+    const { token } = req.body;
+
+    // Verify token with Google
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return res.status(401).json(errorResponse(res, 'Invalid token'));
+    }
+
+    // Check if user exists or create a new user
+    const email = payload.email;
+    if (typeof email === 'undefined') {
+      return res.status(400).json(errorResponse(res, 'Invalid email'));
+    }
+    let user = await prisma.user.findUnique({ where: { user_email: email } });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          user_name: payload.name || '',
+          user_email: email,
+          user_password: '',
+        },
+      });
+    }
+
+    // Generate a session or JWT token for the user
+    // create and assign a token
+    const accessToken = generateAccessToken(user.user_id);
+    const refreshToken = generateRefreshToken(user.user_id);
+
+    await prisma.user.update({
+      where: { user_id: user.user_id },
+      data: { user_refreshToken: refreshToken },
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res
+      .status(200)
+      .json(successResponse('User logged in successfully', accessToken));
+    // Example response with user details
+  } catch (error) {
+    const customError = error as CustomError;
+    logger.error({
+      message: customError.message,
+      stack: customError.stack,
+      apiEndpoint: req.originalUrl,
+    });
+    return res
+      .status(500)
+      .json(errorResponse(res, 'Error in google login', customError.message));
+  }
+};
 
 export async function refreshAccessToken(
   req: Request,
