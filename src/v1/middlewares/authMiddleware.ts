@@ -10,27 +10,36 @@ export default async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req?.headers?.authorization?.split(' ')[1];
-    if (!token) {
-      res.status(401).json(errorResponse(res, 'Invalid Token'));
+    let token = '';
+    let token_string =
+      (req?.headers &&
+        req.headers.authorization &&
+        req?.headers?.authorization?.split(' ')) ||
+      [];
+    if (token_string.length > 1) {
+      token = token_string[1];
     }
-    const decryptedToken = jwt.verify(
-      token,
-      process.env.JWT_ACCESS_SECRET as string
-    );
-    if (decryptedToken) {
-      const profile = await prisma.user.findUnique({
-        where: {
-          user_id: decryptedToken.user_id,
-          user_deleted: false,
-          user_active: true,
-        },
-      });
-      if (profile) {
-        req.profile = profile;
-        next();
+    if (token) {
+      const decryptedToken = jwt.verify(
+        token,
+        process.env.JWT_ACCESS_SECRET as string
+      );
+      if (decryptedToken) {
+        const profile = await prisma.user.findUnique({
+          where: {
+            user_id: decryptedToken.user_id,
+            user_deleted: false,
+            user_active: true,
+          },
+        });
+        if (profile) {
+          req.profile = profile;
+          next();
+        } else {
+          res.status(401).json(errorResponse(res, 'User Not Authenticated'));
+        }
       } else {
-        res.status(401).json(errorResponse(res, 'User Not Authenticated'));
+        res.status(401).json(errorResponse(res, 'Invalid Token'));
       }
     } else {
       res.status(401).json(errorResponse(res, 'Invalid Token'));

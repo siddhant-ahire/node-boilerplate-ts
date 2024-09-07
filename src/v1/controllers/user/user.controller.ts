@@ -99,9 +99,9 @@ export async function login(req: Request, res: Response): Promise<Response> {
     });
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      httpOnly: false, // Set to true for better security setting false becuase its used for client side only
+      secure: process.env.NODE_ENV === 'production', // Use true for production
+      sameSite: 'lax', // Use 'lax' if you're dealing with cross-origin issues
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 

@@ -11,10 +11,21 @@ import swaggerApiDocs from '@/src/swagger-ui/swagger.router';
 
 const app: Application = express();
 app.use(helmet());
+const allowedOrigins = ['http://localhost:3000']; // Add your frontend URL
+
 app.use(
   cors({
-    origin: '*',
-    credentials: true,
+    origin: (origin, callback) => {
+      if (
+        typeof origin === 'string' &&
+        (allowedOrigins.indexOf(origin) !== -1 || !origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Allow credentials
   })
 );
 app.use(httpContext.middleware);
