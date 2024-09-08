@@ -20,26 +20,35 @@ export default async (
       token = token_string[1];
     }
     if (token) {
-      const decryptedToken = jwt.verify(
-        token,
-        process.env.JWT_ACCESS_SECRET as string
-      );
-      if (decryptedToken) {
-        const profile = await prisma.user.findUnique({
-          where: {
-            user_id: decryptedToken.user_id,
-            user_deleted: false,
-            user_active: true,
-          },
-        });
-        if (profile) {
-          req.profile = profile;
-          next();
+      try {
+        const decryptedToken = jwt.verify(
+          token,
+          process.env.JWT_ACCESS_SECRET as string
+        );
+        if (decryptedToken) {
+          const profile = await prisma.user.findUnique({
+            where: {
+              user_id: decryptedToken.user_id,
+              user_deleted: false,
+              user_active: true,
+            },
+          });
+          if (profile) {
+            req.profile = profile;
+            next();
+          } else {
+            res.status(401).json(errorResponse(res, 'User Not Authenticated'));
+          }
         } else {
-          res.status(401).json(errorResponse(res, 'User Not Authenticated'));
+          res.status(401).json(errorResponse(res, 'Invalid Token'));
         }
-      } else {
-        res.status(401).json(errorResponse(res, 'Invalid Token'));
+      } catch (error) {
+        const customError = error as CustomError;
+        res
+          .status(401)
+          .json(
+            errorResponse(res, 'Error in auth middleware', customError.message)
+          );
       }
     } else {
       res.status(401).json(errorResponse(res, 'Invalid Token'));

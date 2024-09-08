@@ -57,9 +57,9 @@
         }
       }
     },
-    "/user/register": {
+    "/auth/register": {
       "post": {
-        "tags": ["User"],
+        "tags": ["Authentication"],
         "summary": "Register a new user",
         "description": "Register a new user with a username, email, and password.",
         "parameters": [
@@ -141,9 +141,9 @@
         }
       }
     },
-    "/user/login": {
+    "/auth/login": {
       "post": {
-        "tags": ["User"],
+        "tags": ["Authentication"],
         "summary": "Log in a user",
         "description": "Log in a user with an email and password.",
         "parameters": [
@@ -217,9 +217,9 @@
         }
       }
     },
-    "/user": {
+    "/auth": {
       "get": {
-        "tags": ["User"],
+        "tags": ["Authentication"],
         "summary": "Retrieve user information",
         "description": "Retrieve user information by passing an authentication token in the `Authorization` header.",
         "parameters": [

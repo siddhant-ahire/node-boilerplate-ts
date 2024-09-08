@@ -5,7 +5,7 @@ import {
   login,
   refreshAccessToken,
   logout,
-} from './user.controller';
+} from './auth.controller';
 import authMiddleware from '@/src/v1/middlewares/authMiddleware';
 const router: Router = Router();
 

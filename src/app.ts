@@ -8,11 +8,13 @@ import errorHandling from '@/src/common/middlewares/errorHandling.middleware';
 import uniqueReqId from '@/src/common/middlewares/uniqueReqId.middleware';
 import http404 from '@/src/common/404/404.router';
 import swaggerApiDocs from '@/src/swagger-ui/swagger.router';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 app.use(helmet());
-const allowedOrigins = ['http://localhost:3000']; // Add your frontend URL
-
+app.use(swaggerApiDocs);
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:5002']; // Add your frontend URL
+app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -34,7 +36,6 @@ app.use(httpLogger.errorHandler);
 app.use(uniqueReqId);
 app.use(express.json());
 app.use('/api/v1', routes);
-app.use(swaggerApiDocs);
 app.use(http404);
 
 app.use(errorHandling);

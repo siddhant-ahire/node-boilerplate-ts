@@ -10,7 +10,7 @@ import {
   logoutUser,
   refreshTokenUser,
   googleLoginUser,
-} from './user.joi.model';
+} from './auth.joi.model';
 import prisma from '@/src/db';
 import {
   generateAccessToken,
@@ -99,7 +99,7 @@ export async function login(req: Request, res: Response): Promise<Response> {
     });
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: false, // Set to true for better security setting false becuase its used for client side only
+      httpOnly: true, // Set to true for better security setting false becuase its used for client side only
       secure: process.env.NODE_ENV === 'production', // Use true for production
       sameSite: 'lax', // Use 'lax' if you're dealing with cross-origin issues
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -175,7 +175,7 @@ export const googleLogin = async (
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -267,7 +267,7 @@ export const logout = async (
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     return res.sendStatus(204);
@@ -290,6 +290,7 @@ export async function getUser(
 ): Promise<Response> {
   try {
     delete req?.profile?.user_password;
+    delete req?.profile?.user_refreshToken;
     return res
       .status(200)
       .json(successResponse('User data found successfully', req.profile));

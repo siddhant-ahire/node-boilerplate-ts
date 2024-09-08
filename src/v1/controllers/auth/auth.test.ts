@@ -16,13 +16,13 @@ jest.mock('@/src/db', () => {
   };
 });
 
-describe('POST /api/v1/user/register', () => {
+describe('POST /api/v1/auth/register', () => {
   beforeEach(() => {
     jest.resetAllMocks(); // Reset mocks before each test
   });
   it('should return 200 for a valid request', async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(null); // No user found
-    const response = await request(app).post('/api/v1/user/register').send({
+    const response = await request(app).post('/api/v1/auth/register').send({
       user_name: 'admin',
       user_email: 'admin@example.com',
       user_password: '123456',
@@ -32,14 +32,14 @@ describe('POST /api/v1/user/register', () => {
   });
 
   it('should return 400 for an invalid request', async () => {
-    const response = await request(app).post('/api/v1/user/register').send({}); // Sending invalid data
+    const response = await request(app).post('/api/v1/auth/register').send({}); // Sending invalid data
 
     expect(response.status).toBe(400);
   });
   it('should return 500 if the user already exists', async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({}); // Simulate user exists
 
-    const response = await request(app).post('/api/v1/user/register').send({
+    const response = await request(app).post('/api/v1/auth/register').send({
       user_name: 'admin',
       user_email: 'admin@example.com',
       user_password: '123456',
@@ -51,7 +51,7 @@ describe('POST /api/v1/user/register', () => {
   });
 });
 
-describe('POST /api/v1/user/login', () => {
+describe('POST /api/v1/auth/login', () => {
   beforeEach(() => {
     jest.resetAllMocks(); // Reset mocks before each test
   });
@@ -64,7 +64,7 @@ describe('POST /api/v1/user/login', () => {
       user_id: 1, // Arbitrary user_id
       user_password: 'mockedHashedPassword', // Arbitrary hashed password
     });
-    const response = await request(app).post('/api/v1/user/login').send({
+    const response = await request(app).post('/api/v1/auth/login').send({
       user_email: 'admin@example.com',
       user_password: '123456',
     });
@@ -73,13 +73,13 @@ describe('POST /api/v1/user/login', () => {
   });
 
   it('should return 400 for an invalid request', async () => {
-    const response = await request(app).post('/api/v1/user/login').send({}); // Sending invalid data
+    const response = await request(app).post('/api/v1/auth/login').send({}); // Sending invalid data
 
     expect(response.status).toBe(400);
   });
 });
 
-describe('GET /api/v1/user', () => {
+describe('GET /api/v1/auth', () => {
   beforeEach(() => {
     jest.resetAllMocks(); // Reset mocks before each test
   });
@@ -88,7 +88,7 @@ describe('GET /api/v1/user', () => {
     let token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJpYXQiOjE3MjUxODI4ODgsImV4cCI6MTcyNTI2OTI4OH0.JF-YB8UdDfj_mjOV4U5mBTVr2HeqFYLXFF93Ft4-l9A';
     const response = await request(app)
-      .get('/api/v1/user')
+      .get('/api/v1/auth')
       .set('Authorization', `Bearer ${token}`); // Simulate a request with token
 
     expect(response.status).toBe(httpStatus.OK);
