@@ -15,11 +15,11 @@ export const loginUser = Joi.object({
 
 export const refreshTokenUser = Joi.object({
   refreshToken: Joi.string().required(),
-});
+}).unknown(true);
 
 export const logoutUser = Joi.object({
   refreshToken: Joi.string().required(),
-});
+}).unknown(true);
 
 export const googleLoginUser = Joi.object({
   token: Joi.string().required(),
