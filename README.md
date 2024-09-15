@@ -29,6 +29,10 @@ Create a `.env` file in the root directory of the project with the following con
 ```env
 PORT=5002
 NODE_ENV="development" # development, staging, production
+GOOGLE_CLIENT_ID=""
+EMAIL_USER="youremail@example.com"
+EMAIL_PASS=""
+FRONTEND_URL="http://localhost:3000"
 
 # auth >>>
 JWT_ACCESS_SECRET="your-jwt-secret"
@@ -54,6 +58,10 @@ Create a `.env.test` file in the root directory of the project to run tests with
 ```
 PORT=5002
 NODE_ENV="development" # development, staging, production
+GOOGLE_CLIENT_ID=""
+EMAIL_USER="youremail@example.com"
+EMAIL_PASS=""
+FRONTEND_URL="http://localhost:3000"
 
 # auth >>>
 JWT_ACCESS_SECRET="your-jwt-secret"
