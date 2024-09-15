@@ -15,15 +15,17 @@ datasource db {
 }
 
 model User {
-  user_id           Int      @id @default(autoincrement())
-  user_name         String   @db.VarChar(256)
-  user_email        String   @unique
-  user_password     String   @db.VarChar(256)
-  user_refreshToken String?  @db.Text
-  user_active       Boolean  @default(true)
-  user_deleted      Boolean  @default(false)
-  user_created_at   DateTime @default(now())
-  user_updated_at   DateTime @updatedAt
+  user_id                Int       @id @default(autoincrement())
+  user_name              String    @db.VarChar(256)
+  user_email             String    @unique
+  user_password          String    @db.VarChar(256)
+  user_refreshToken      String?   @db.Text
+  reset_token            String?   @db.Text // For storing the password reset token
+  reset_token_expiration DateTime? // For storing when the token expires
+  user_active            Boolean   @default(true)
+  user_deleted           Boolean   @default(false)
+  user_created_at        DateTime  @default(now())
+  user_updated_at        DateTime  @updatedAt
 
   @@index([user_active])
   @@index([user_deleted])

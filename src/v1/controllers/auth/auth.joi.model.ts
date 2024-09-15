@@ -24,3 +24,12 @@ export const logoutUser = Joi.object({
 export const googleLoginUser = Joi.object({
   token: Joi.string().required(),
 });
+
+export const requestPasswordResetUser = Joi.object({
+  email: Joi.string().required(),
+});
+
+export const resetPasswordUser = Joi.object({
+  token: Joi.string().required(),
+  new_password: Joi.string().required(),
+});

@@ -1,5 +1,6 @@
 import { CustomError, RequestWithProfile } from '@/src/v1/types';
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 import { successResponse, errorResponse } from '@/src/v1/services/response';
@@ -10,11 +11,14 @@ import {
   logoutUser,
   refreshTokenUser,
   googleLoginUser,
+  requestPasswordResetUser,
+  resetPasswordUser,
 } from './auth.joi.model';
 import prisma from '@/src/db';
 import {
   generateAccessToken,
   generateRefreshToken,
+  sendEmailInChildProcess,
 } from '@/src/v1/helper/authHelper';
 import { OAuth2Client } from 'google-auth-library';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -239,6 +243,113 @@ export async function refreshAccessToken(
     return res
       .status(500)
       .json(errorResponse(res, 'Error in Refreshtoken', customError.message));
+  }
+}
+
+export async function requestPasswordReset(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    // Validate the request parameters
+    const { error } = requestPasswordResetUser.validate(req.body);
+
+    if (error) {
+      return res.status(400).json(errorResponse(res, error.details[0].message));
+    }
+    const { email } = req.body;
+
+    // Check if the user exists
+    const user = await prisma.user.findUnique({ where: { user_email: email } });
+    if (!user) {
+      return res.status(404).json(errorResponse(res, 'User not found'));
+    }
+
+    // Generate a reset token and expiration time
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiration = new Date(Date.now() + 3600000); // 1 hour
+
+    // Save the reset token and expiration time in the database
+    await prisma.user.update({
+      where: { user_id: user.user_id },
+      data: {
+        reset_token: resetToken,
+        reset_token_expiration: resetTokenExpiration,
+      },
+    });
+    sendEmailInChildProcess(email, resetToken);
+    return res
+      .status(200)
+      .json(successResponse('Password reset email sent successfully', null));
+  } catch (error) {
+    const customError = error as CustomError;
+    logger.error({
+      message: customError.message,
+      stack: customError.stack,
+      apiEndpoint: req.originalUrl,
+    });
+    return res
+      .status(500)
+      .json(
+        errorResponse(res, 'Error in requestPasswordReset', customError.message)
+      );
+  }
+}
+
+export async function resetPassword(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    // Validate the request parameters
+    const { error } = resetPasswordUser.validate(req.body);
+
+    if (error) {
+      return res.status(400).json(errorResponse(res, error.details[0].message));
+    }
+
+    const { token, new_password } = req.body;
+
+    // Check if the reset token is valid
+    const user = await prisma.user.findFirst({
+      where: {
+        reset_token: token,
+        reset_token_expiration: { gt: new Date() }, // Token should be valid
+      },
+    });
+    if (!user) {
+      return res
+        .status(400)
+        .json(errorResponse(res, 'Invalid or expired reset token'));
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(new_password, salt);
+
+    // Update the user's password and clear the reset token
+    await prisma.user.update({
+      where: { user_id: user.user_id },
+      data: {
+        user_password: hashedPassword,
+        reset_token: null,
+        reset_token_expiration: null,
+      },
+    });
+
+    return res
+      .status(200)
+      .json(successResponse('Password reset successfully', null));
+  } catch (error) {
+    const customError = error as CustomError;
+    logger.error({
+      message: customError.message,
+      stack: customError.stack,
+      apiEndpoint: req.originalUrl,
+    });
+    return res
+      .status(500)
+      .json(errorResponse(res, 'Error in resetPassword', customError.message));
   }
 }
 
