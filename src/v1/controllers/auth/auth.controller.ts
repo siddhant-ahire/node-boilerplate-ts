@@ -8,7 +8,6 @@ import { logger } from '@/src/v1/services/logger';
 import {
   loginUser,
   registerUser,
-  logoutUser,
   refreshTokenUser,
   googleLoginUser,
   requestPasswordResetUser,
@@ -230,7 +229,12 @@ export async function refreshAccessToken(
         const newAccessToken = generateAccessToken(user.user_id);
         return res
           .status(200)
-          .json(successResponse('User logged in successfully', newAccessToken));
+          .json(
+            successResponse(
+              'Access token refreshed successfully.',
+              newAccessToken
+            )
+          );
       }
     );
   } catch (error) {
@@ -339,7 +343,7 @@ export async function resetPassword(
 
     return res
       .status(200)
-      .json(successResponse('Password reset successfully', null));
+      .json(successResponse('Password has been reset successfully', null));
   } catch (error) {
     const customError = error as CustomError;
     logger.error({
@@ -354,24 +358,12 @@ export async function resetPassword(
 }
 
 export const logout = async (
-  req: Request,
+  req: RequestWithProfile,
   res: Response
 ): Promise<Response> => {
   try {
-    // Validate the request parameters
-    const { error } = logoutUser.validate(req.cookies);
-
-    if (error) {
-      return res.status(400).json(errorResponse(res, error.details[0].message));
-    }
-    const refreshToken = req.cookies.refreshToken;
-    const user = await prisma.user.findFirst({
-      where: { user_refreshToken: refreshToken },
-    });
-    if (!user) return res.sendStatus(204);
-
     await prisma.user.update({
-      where: { user_id: user.user_id },
+      where: { user_id: req.profile?.user_id },
       data: { user_refreshToken: null },
     });
 

@@ -32,7 +32,7 @@ router.post('/forgot-password', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 
 // logout
-router.post('/logout', logout);
+router.post('/logout', authMiddleware, logout);
 
 // get User Profile
 router.get('/', authMiddleware, getUser);

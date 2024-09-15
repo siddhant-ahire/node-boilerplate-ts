@@ -283,6 +283,342 @@
           }
         }
       }
+    },
+    "/auth/google-login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login with Google",
+        "description": "Authenticate a user with Google using an OAuth2 token. The token is obtained from the frontend. The token is then used to authenticate the user.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Google OAuth2 token",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["token"],
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "Google OAuth2 token obtained from the frontend",
+                  "example": "ya29.a0AfH6SM..."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Login successful."
+                },
+                "token": {
+                  "type": "string",
+                  "description": "Authentication token for the user",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, invalid token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid OAuth2 token."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "description": "Refresh an access token by passing a valid refresh token in the `Authorization` header.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "Refresh token in the format 'Bearer {refresh_token}'",
+            "required": true,
+            "type": "string",
+            "default": "Bearer {refresh_token}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New access token generated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "Status of the response",
+                  "example": "success"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Access token refreshed successfully."
+                },
+                "data": {
+                  "type": "string",
+                  "description": "New refresh token (optional, if issued)",
+                  "example": "1//03r1VZrxWLqLQ..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request, invalid refresh token format",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid refresh token."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, expired or invalid refresh token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Refresh token is expired or invalid."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Forgot password",
+        "description": "Request a password reset link by providing the user's registered email.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Email address of the user requesting password reset",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["email"],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Registered email address of the user",
+                  "format": "email",
+                  "example": "johndoe@example.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset email sent successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Password reset link has been sent to your email."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email or email not registered",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Email not found or invalid input."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Reset password",
+        "description": "Reset the user's password using the reset token provided via email.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "New password and reset token",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["token", "new_password"],
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "Password reset token received via email",
+                  "example": "abcdef123456"
+                },
+                "new_password": {
+                  "type": "string",
+                  "description": "New password for the user",
+                  "format": "password",
+                  "example": "NewP@ssword!"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Password has been reset successfully."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reset token or weak password",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid token or weak password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "description": "Logs out a user by invalidating their refresh token and optionally their access token.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "description": "The access token of the user",
+            "required": true,
+            "type": "string",
+            "default": "Bearer {token}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully logged out",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "User logged out successfully."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, invalid or expired token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized access. Invalid or expired token."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
