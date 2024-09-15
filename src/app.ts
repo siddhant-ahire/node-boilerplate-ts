@@ -18,6 +18,9 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
+      if (origin === undefined) {
+        return callback(null, true); // its a request from the same origin
+      }
       if (
         typeof origin === 'string' &&
         (allowedOrigins.indexOf(origin) !== -1 || !origin)
@@ -30,6 +33,8 @@ app.use(
     credentials: true, // Allow credentials
   })
 );
+// Handle OPTIONS preflight requests
+app.options('*', cors());
 app.use(httpContext.middleware);
 app.use(httpLogger.successHandler);
 app.use(httpLogger.errorHandler);

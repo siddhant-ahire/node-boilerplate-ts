@@ -15,6 +15,7 @@ const errorHandling = (
     });
   } else {
     // General error handling
+    console.error(err);
     res.status(500).json({
       message: 'An unexpected error occurred',
     });
